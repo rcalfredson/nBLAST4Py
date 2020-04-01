@@ -1,1 +1,6 @@
-.vscode
+.vscode/*
+skeletons/*.swc
+skeletons/*.pickskel
+nblast_results_*
+Pipfile.lock
+__pycache__

@@ -1,3 +1,5 @@
+"""Conduct NBLAST search"""
+
 import argparse, json, os
 import numpy as np
 import timeit
@@ -25,8 +27,8 @@ def options():
     'translation of origin of node coordinates from center of brain to ' + 
     'Hemibrain origin (roughly, the upper left corner of image)',
     action='store_true')
-  p.add_argument('--reflect', dest='reflect', action='store_true',
-    help='reflect the query neuron across the Y axis.')
+  p.add_argument('--reflectX', dest='reflectX', action='store_true',
+    help='flip sign of X coords of the query neuron (reflect across Y axis.')
   p.add_argument('--anatO', dest='anatomicalOrigin', help='coordinates of the' +
     ' anatomical origin, where X and Y correspond to the center of the cavity' +
     ' between the nodulus and the ellipsoid body in the XY plane, and Z' +
@@ -42,8 +44,8 @@ anatomicalO = [-np.float32(coord) for coord in opts.anatomicalOrigin.split(',')]
 query = SWCHelper(opts.query, origin=anatomicalO, doPickle=False)
 if not opts.noRescale:
   query.rescale(MICROMETER_TO_HEMI_PIXELS)
-if opts.reflect:
-  query.reflect()
+if opts.reflectX:
+  query.reflectX()
 if not opts.noOriginTranslate:
   query.translateOrigin(HEMI_ORIGIN_TO_BRAIN_CENTER)
 targets = globFiles(opts.dir, 'swc')
