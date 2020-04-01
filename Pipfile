@@ -8,7 +8,6 @@ pylint = "*"
 
 [packages]
 numpy = "*"
-scikit-learn = "*"
 feather-format = "*"
 pandas = "*"
 
