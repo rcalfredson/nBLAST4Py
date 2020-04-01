@@ -9,9 +9,14 @@ Again, the [GitHub repository](https://github.com/ethz-asl/libnabo#compilation) 
 ### Install Python packages
 Either create a virtualenv using the given Pipfile and [`pipenv`](https://github.com/pypa/pipenv), or simply install `numpy`, `feather-format`, and `pandas` system-wide using `pip`.
 ### Populate `skeletons` directory with SWC files
-The neuron database used by this developer was Hemibrain; see the project overview [here](https://www.janelia.org/project-team/flyem/hemibrain) and download the database of 21,663 neurons [here](https://storage.cloud.google.com/hemibrain-release/skeletons.tar.gz).
+The neuron database used by this developer was Hemibrain (for _Drosophila_); see the project overview [here](https://www.janelia.org/project-team/flyem/hemibrain) and download the database of 21,663 neurons [here](https://storage.cloud.google.com/hemibrain-release/skeletons.tar.gz).
+
+If another database is used, then minor modification to the code would be needed because two constants (`HEMI_ORIGIN_TO_BRAIN_CENTER` and `MICROMETER_TO_HEMI_PIXELS`) are Hemibrain specific and would need to be parameterized or generalized.
 
 ## Usage
 ### Prerequisites
 - Z-stack image of neurons to query; it must already have undergone registration, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/).
-- Coordinates in µm of the point in the brain shown here [#so-called anatomical origin of the brain](anatomicalOrigin.png)
+- Coordinates in µm of the point in the brain shown here, namely, the center of the negative space between the ellipsoid body and the nodulus, with respect to the upper left corner of the scanned image.
+  - For images registered to the template [FCWB](http://natverse.org/nat.flybrains/reference/FCWB.html), this point's location is (281, 105, 54).
+  - For animals other than Drosophila, an analogous reference point would need to be defined, and the constant `HEMI_ORIGIN_TO_BRAIN_CENTER` would need to be modified.
+  - ![so-called anatomical origin of the brain](anatomicalOrigin.png)
