@@ -20,3 +20,10 @@ If another database is used, then minor modification to the code would be needed
   - For images registered to the template [FCWB](http://natverse.org/nat.flybrains/reference/FCWB.html), this point's location is (281, 105, 54).
   - For animals other than Drosophila, an analogous reference point would need to be defined, and the constant `HEMI_ORIGIN_TO_BRAIN_CENTER` would need to be modified.
   - ![so-called anatomical origin of the brain](anatomicalOrigin.png)
+### Steps
+1. Annotate a neuron from your image
+  - [Simple Neurite Tracer](https://imagej.net/Simple_Neurite_Tracer), a plugin of [ImageJ](https://imagej.net/Welcome) or [Fiji](https://fiji.sc/)) is recommended, but any tool works as long as it outputs an SWC file.
+2. Run NBLAST search
+  - Example: `python findNeuronMatches.py -q ${YOUR_SWC_FILE} --anatO 281,105,54`
+  - Use `-h` argument for full documentation of options
+  - **Note: if using Hemibrain, use `reflectX` if your query neuron is on the right-hand side, but has a left-hand analog (Hemibrain only covers the region shown here in blue)** ![Hemibrain dataset highlighted blue](https://www.janelia.org/sites/default/files/hemibrain_logo-gray-322x227.png)
