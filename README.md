@@ -21,14 +21,14 @@ If another database is used, then minor modification to the code would be needed
   - For animals other than Drosophila, an analogous reference point would need to be defined, and the constant `HEMI_ORIGIN_TO_BRAIN_CENTER` would need to be modified.
   - ![so-called anatomical origin of the brain](anatomicalOrigin.png)
 ### Steps
-1. Annotate a neuron from your image
+1. Annotate a neuron from your image.
     - [Simple Neurite Tracer](https://imagej.net/Simple_Neurite_Tracer) (plugin of [ImageJ](https://imagej.net/Welcome) or [Fiji](https://fiji.sc/)) is recommended, but any tool works as long as it outputs an SWC file.
-2. Run NBLAST search
+2. Run NBLAST search.
     - Example: `python findNeuronMatches.py -q ${YOUR_SWC_FILE} --anatO 281,105,54`
     - Use `-h` argument for full documentation of options
     - Note: if you are using Hemibrain and your query neuron is on the right-hand side, then use the `--reflectX` option. Hemibrain only covers the blue region in the image below, and so it is necessary in this case to search for your query neuron's left-handed analogous pair. 
     - ![Hemibrain dataset highlighted blue](https://www.janelia.org/sites/default/files/hemibrain_logo-gray-322x227.png)
-3. Inspect results
+3. Inspect results.
     - The search script outputs a JSON file assigning a score to each target neuron in the target database, with a higher score implying a better match with the query neuron.
     - For Hemibrain search:
       - Visit Hemibrain's [neuPrintExplorer](https://neuprint.janelia.org/?dataset=hemibrain:v1.0.1&qt=findneurons)
