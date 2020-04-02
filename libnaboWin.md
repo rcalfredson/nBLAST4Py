@@ -4,7 +4,7 @@
 3. Clone the [Libnabo repository from GitHub](https://github.com/ethz-asl/libnabo#download) to your local machine.
 4. Create a separate directory for the Libnabo build in a location of your choice; open a command line and change to that directory.
 5. In the Libnabo source, open `python/CMakeLists.txt` and modify it as follows:
-    - Above line 46 (`find_package(Boost ...)`), add the line `include_directories(${BOOST_INCLUDEDIR} ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR})`
+    - Above line 46 (starting with `find_package(Boost ...)`), add the line `include_directories(${BOOST_INCLUDEDIR} ${PYTHON_INCLUDE_DIRS} ${NUMPY_INCLUDE_DIR})`
     - On the line beginning `find_package(Boost ...)`, remove the `COMPONENTS ${BOOST_PYTHON_COMPONENT}` argument. The reason is I found it did not locate the library files unless they have the exact name `libboost_pythonXx`, whereas the library files produced by Boost.Python carry information about the compiler, threading type, et cetera. Thus, in my opinion to rename the library files just to honor CMake's inflexible search capabilities.
     - On line 61 of the original file (the `target_link_libraries` command in the `else (SHARED_LIBS)` block), manually add the paths to the two Boost.Python DLLs created in the [the previous step](boostPythonMinGW.md)
 6. Run the `cmake` command
