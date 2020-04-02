@@ -36,4 +36,4 @@ If another database is used, then minor modification to the code would be needed
       - In the table of results, click the small eye icon beside the neuron ID and two visualizers will appear: Neuroglancer, which superimposes the skeleton and synapses of the neuron against the raw Hemibrain image data, and a simple skeleton viewer. The former is essential to determine whether the target neuron is located in the expected region of the brain.
       - ![Hemibrain button to activate visualizer](visualizeButton.png)
     - For non-Hemibrain search:
-      - The above-mentioned results file is the final output of this program, and further analysis and visualization would need to be implemented separately. 
+      - The above-mentioned results file is the final output of this program, and further analysis and visualization would need to be implemented separately.
