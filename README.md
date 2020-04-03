@@ -4,7 +4,7 @@ A high-performance Python implementation of the NBLAST neuron search algorithm a
 ## Setup
 ### Install Python
 #### For Ubuntu
-[These instructions](https://tecadmin.net/install-python-3-8-ubuntu/) yielded success; the only addition is that the flag `--enable-shared` must be passed when calling `configure`.
+[These instructions](https://tecadmin.net/install-python-3-8-ubuntu/) yielded success; the only additions are that 1) the flag `--enable-shared` must be passed when calling `configure` and 2) afterward, the command `sudo ldconfig /usr/local/lib` is required to be able to install Python packages.
 #### For Windows
 The [installer executables](https://www.python.org/downloads/) provided by the Python Software Foundation worked well.
 ### Install Boost.Python
@@ -14,7 +14,11 @@ See the project's [GitHub repository](https://github.com/boostorg/python#build) 
 
 [Details specific to Windows machines using MinGW](boostPythonMinGW.md)
 ### Install Libnabo
-Again, the [GitHub repository](https://github.com/ethz-asl/libnabo#compilation) contains generic instructions; Windows-specific details are [here](libnaboWin.md). Once you have built Pynabo, the library's C extension for Python, then copy it to the DLLs directory of your Python installation, along with any DLLs on which it may depend, chiefly Boost.Python.
+Again, the [GitHub repository](https://github.com/ethz-asl/libnabo#compilation) contains generic instructions.
+
+[Details specific to Ubuntu](libnaboUbuntu.md)
+
+[Details specific to Windows machines using MinGW](libnaboWin.md)
 ### Install Python packages
 Either create a virtualenv using the given Pipfile and [`pipenv`](https://github.com/pypa/pipenv), or simply install `numpy`, `feather-format`, and `pandas` system-wide using `pip`.
 ### Populate `skeletons` directory with SWC files
