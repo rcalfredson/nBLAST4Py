@@ -1,6 +1,7 @@
 # Building Libnabo on Windows using MinGW
 1. Install CMake using an installer from [this page](https://cmake.org/download/) ("Windows win64-x64 Installer" in my case).
 2. Install Numpy using your preferred method, and ensure you know its installation path (e.g., `$PATH_TO_PYTHON/Lib/site-packages/numpy`)
+3. Download the [Eigen header library](http://eigen.tuxfamily.org/index.php?title=Main_Page) to your preferred directory (any path works because it gets passed explicitly to CMake in step 6).
 3. Clone the [Libnabo repository from GitHub](https://github.com/ethz-asl/libnabo#download) to your local machine.
 4. Create a separate directory for the Libnabo build in a location of your choice; open a command line and change to that directory.
 5. In the Libnabo source, open `python/CMakeLists.txt` and modify it as follows:
