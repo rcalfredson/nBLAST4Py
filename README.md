@@ -2,8 +2,17 @@
 A high-performance Python implementation of the NBLAST neuron search algorithm adapted from the R package nat.nblast (https://github.com/natverse/nat.nblast)
 
 ## Setup
+### Install Python
+#### For Ubuntu
+[These instructions](https://tecadmin.net/install-python-3-8-ubuntu/) yielded success; the only addition is that the flag `--enable-shared` must be passed when calling `configure`.
+#### For Windows
+The [installer executables](https://www.python.org/downloads/) provided by the Python Software Foundation worked well.
 ### Install Boost.Python
-See the project's [GitHub repository](https://github.com/boostorg/python#build) for generic instructions, and [this document](boostPythonMinGW.md) for details specific to Windows machines using MinGW.
+See the project's [GitHub repository](https://github.com/boostorg/python#build) for generic instructions.
+
+[Details specific to Ubuntu](boostUbuntu.md)
+
+[Details specific to Windows machines using MinGW](boostPythonMinGW.md)
 ### Install Libnabo
 Again, the [GitHub repository](https://github.com/ethz-asl/libnabo#compilation) contains generic instructions; Windows-specific details are [here](libnaboWin.md). Once you have built Pynabo, the library's C extension for Python, then copy it to the DLLs directory of your Python installation, along with any DLLs on which it may depend, chiefly Boost.Python.
 ### Install Python packages
