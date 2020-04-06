@@ -3,6 +3,7 @@
 import argparse, json, os
 import numpy as np
 import timeit
+import sys
 
 from common import globFiles
 from swcHelper import SWCHelper
@@ -15,9 +16,8 @@ def options():
   """Parse options for NBLAST search engine."""
   p = argparse.ArgumentParser(description=
     'Runs NBLAST search for a given query neuron skeleton (in SWC format) and' +
-    'returns a match score for every neuron in the Hemibrain database.')
-  p.add_argument('-q', dest='query',
-    help='path to SWC file for the query neuron')
+    ' returns a match score for every neuron in the Hemibrain database.')
+  p.add_argument('query', help='path to SWC file for the query neuron')
   p.add_argument('-d', dest='dir', help='path to directory of SWC files of ' +
     'the target neurons (default: skeletons sub-folder)', default='skeletons')
   p.add_argument('--noRescale', dest='noRescale', help='skip rescaling ' +
@@ -39,22 +39,29 @@ def options():
   return p.parse_args()
 
 startT = timeit.default_timer()
-opts = options()
-anatomicalO = [-np.float32(coord) for coord in opts.anatomicalOrigin.split(',')]
-query = SWCHelper(opts.query, origin=anatomicalO, doPickle=False)
-if not opts.noRescale:
-  query.rescale(MICROMETER_TO_HEMI_PIXELS)
-if opts.reflectX:
-  query.reflectX()
-if not opts.noOriginTranslate:
-  query.translateOrigin(HEMI_ORIGIN_TO_BRAIN_CENTER)
-targets = globFiles(opts.dir, 'swc')
-nblast = NBLASTHelper(query)
-scores = nblast.calculateMatchScores(targets)
-if opts.normalize:
-  scores = scores / np.max(scores)
-with open('nblast_results_%s.json'%os.path.splitext(os.path.basename(
-    opts.query))[0], 'w', encoding='utf-8') as f:
-  json.dump(sorted(list(zip(targets, scores)), key=lambda x: x[1],
-    reverse=True), f, ensure_ascii=False, indent=4)
-print('total compute time:', timeit.default_timer() - startT)
+print('sys.argv:', sys.argv)
+def runSearch():
+  opts = options()
+  anatomicalO = [-np.float32(coord) for coord in opts.anatomicalOrigin.split(',')]
+  query = SWCHelper(opts.query, origin=anatomicalO, doPickle=False)
+  if not opts.noRescale:
+    query.rescale(MICROMETER_TO_HEMI_PIXELS)
+  if opts.reflectX:
+    query.reflectX()
+  if not opts.noOriginTranslate:
+    query.translateOrigin(HEMI_ORIGIN_TO_BRAIN_CENTER)
+  targets = globFiles(opts.dir, 'swc')
+  print('targets?', targets)
+  nblast = NBLASTHelper(query)
+  scores = nblast.calculateMatchScores(targets)
+  print('socres?', scores)
+  if opts.normalize:
+    scores = scores / np.max(scores)
+  with open('nblast_results_%s.json'%os.path.splitext(os.path.basename(
+      opts.query))[0], 'w', encoding='utf-8') as f:
+    json.dump(sorted(list(zip(targets, scores)), key=lambda x: x[1],
+      reverse=True), f, ensure_ascii=False, indent=4)
+  print('total compute time:', timeit.default_timer() - startT)
+
+if __name__ == "__main__":
+  runSearch()

@@ -10,6 +10,9 @@ pylint = "*"
 numpy = "*"
 feather-format = "*"
 pandas = "*"
+pytest = "*"
+pytest-html = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.6"

@@ -50,3 +50,7 @@ If another database is used, then minor modification to the code would be needed
       - ![Hemibrain button to activate visualizer](visualizeButton.png)
     - For non-Hemibrain search:
       - The above-mentioned results file is the final output of this program, and further analysis and visualization would need to be implemented separately.
+
+## Development
+### Running tests
+`python -m pipenv run pytest --cov=.\ --cov-report html --html=report.html tests/`

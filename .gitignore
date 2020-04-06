@@ -1,3 +1,7 @@
+.coverage
+report.html
+assets/*
+htmlcov/*
 .vscode/*
 skeletons/*.swc
 skeletons/*.pickskel
