@@ -35,6 +35,13 @@ class ValidCallsToScript(unittest.TestCase):
       findNeuronMatches.runSearch()
       assert len(reflectX_mock.call_args_list) == 1
 
+  @patch('swcHelper.SWCHelper.rescale')
+  def testCallsRescaleAsNeeded(self, rescale_mock, *args):
+    """Ensure SWCHelper.rescale() gets called if --rescale flag is present."""
+    with patch.object(sys, 'argv', ['', 'mockQ.swc', '--rescale', '3.2']):
+      findNeuronMatches.runSearch()
+      assert len(rescale_mock.call_args_list) == 1
+
   @patch('swcHelper.SWCHelper.reflectX')
   @patch('json.dump')
   def testNormalizeScoresAsNeeded(self, json_mock, reflectX_mock, mock_nbh,

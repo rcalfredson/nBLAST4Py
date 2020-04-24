@@ -1,6 +1,7 @@
 """NBLASTHelper class"""
 import timeit
 import numpy as np
+import matplotlib.pyplot as plt
 from pynabo import SearchOptionFlags
 import feather
 
@@ -29,6 +30,16 @@ class NBLASTHelper():
       nnIdxs = np.hstack((nns[0], np.array(range(self.query.numPts))
         .reshape(-1, 1)))
       dists = np.sqrt(np.squeeze(nns[1]))
+      # idx = list(dists).index(min(dists))
+      # print('min distance:', dists[idx])
+      # print('points:', nnIdxs[idx])
+      # print('query:', self.query.x[nnIdxs[idx][1]], self.query.y[nnIdxs[idx][1]], self.query.z[nnIdxs[idx][1]])
+      # print('target:', target.x[nnIdxs[idx][0]], target.y[nnIdxs[idx][0]], target.z[nnIdxs[idx][0]])
+      # fig = plt.figure()
+      # ax = fig.add_subplot(111, projection='3d')
+      # ax.plot(self.query.x, self.query.y, zs=self.query.z)
+      # ax.plot(target.x, target.y, zs=target.z)
+      # plt.show()
       dirVectors = self.findDirectionVectorsFromParents(target, nnIdxs)
       dotProds = np.abs(np.einsum('ij,ij->i', dirVectors[:, 0:3],
         dirVectors[:, 3:6]))
@@ -47,7 +58,7 @@ class NBLASTHelper():
     catsByType = [list(self.scoreMatrix[rangeName].cat.categories) for\
       rangeName in ('Var1', 'Var2')]
     scoreTable = np.array(self.scoreMatrix['Freq']).reshape((
-      len(catsByType[0]), len(catsByType[1])))
+      len(catsByType[1]), len(catsByType[0]))).T
     dotProdRanges, distanceRanges = [], []
     for tI, rangeType in enumerate((distanceRanges, dotProdRanges)):
       for rI, catRange in enumerate(catsByType[tI]):
@@ -56,9 +67,13 @@ class NBLASTHelper():
         if rI == len(catsByType[tI]) - 1:
           rangeType.append(catRange[1])
     distanceRanges = np.array(distanceRanges)
+    #print('dotProd ranges:', dotProdRanges)
     dotProdRanges = np.array(dotProdRanges)
     distBins = np.histogram2d(dists, np.array(dotProds),
       bins=np.array([distanceRanges, dotProdRanges]))[0]
+    # print('scoreTable:', scoreTable)
+    # print(scoreTable.shape)
+    # print('scoreTable before reshaping:', self.scoreMatrix['Freq'])
     return np.sum(np.multiply(distBins, scoreTable))
 
   def findDirectionVectorsFromParents(self, target, nnIdxs):

@@ -8,9 +8,9 @@ from pynabo import NearestNeighbourSearch
 class SWCHelper:
   """Read SWC files."""
 
-  def __init__(self, path, origin=(0, 0, 0), doPickle=True):
+  def __init__(self, path):
     """Read an SWC file from the given path."""
-    self.path, self.origin = path, origin
+    self.path = path
     self.x, self.y, self.z, self.parents, self.ids = [], [], [], [], []
     pklPath = '%s.pickSkel'%path.split('.swc')[0]
     hasPickle = os.path.exists(pklPath)
@@ -42,7 +42,7 @@ class SWCHelper:
         (-1, 'parents')):
       dataPiece = data[dataIdx].strip()
       if dataIdx >= 2:
-        dataPiece = np.float32(dataPiece) + self.origin[dataIdx - 2]
+        dataPiece = np.float32(dataPiece)
       else:
         dataPiece = int(dataPiece)
       getattr(self, attrName).append(dataPiece)
@@ -51,11 +51,6 @@ class SWCHelper:
     """Multiply the coords of each node by the given factor."""
     for attr in ('x', 'y', 'z'):
       setattr(self, attr, np.multiply(getattr(self, attr), scalingFactor))
-  
-  def translateOrigin(self, origin):
-    """"Add the given origin (XYZ tuple) to the coords of each node."""
-    for i, attr in enumerate(('x', 'y', 'z')):
-      setattr(self, attr, np.add(getattr(self, attr), origin[i]))
 
   def reflectX(self):
     """Flip the sign of X coordinates (reflect across Y axis)."""

@@ -32,6 +32,15 @@ class TestSWCHelper:
     assert np.array_equal(mySWCHelper.x, -1 * origX) == True
 
   @patch('builtins.open')
+  def testRescale(self, *args):
+    """Ensure coordinates get rescaled after calling rescale()."""
+    mySWCHelper = SWCHelper('')
+    origX, scalingFactor = np.random.random(5), np.random.random()
+    mySWCHelper.x = origX
+    mySWCHelper.rescale(scalingFactor)
+    assert np.array_equal(mySWCHelper.x, scalingFactor * origX) == True
+
+  @patch('builtins.open')
   def testParentsCleanup(self, *args):
     """Ensure parent indices with any value <1 get replaced by the first
     offspring of that point, if it exists."""

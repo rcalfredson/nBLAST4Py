@@ -22,26 +22,24 @@ Again, the [GitHub repository](https://github.com/ethz-asl/libnabo#compilation) 
 ### Install Python packages
 Either create a virtualenv using the given Pipfile and [`pipenv`](https://github.com/pypa/pipenv), or simply install `numpy`, `feather-format`, and `pandas` system-wide using `pip`.
 ### Populate `skeletons` directory with SWC files
-The neuron database used by this developer was Hemibrain (for _Drosophila_); see the project overview [here](https://www.janelia.org/project-team/flyem/hemibrain) and download the database of 21,663 neurons [here](https://storage.cloud.google.com/hemibrain-release/skeletons.tar.gz).
-
-If another database is used, then minor modification to the code would be needed because two constants (`HEMI_ORIGIN_TO_BRAIN_CENTER` and `MICROMETER_TO_HEMI_PIXELS`) are Hemibrain specific and would need to be parameterized or generalized.
+This project was originally designed for use with the Hemibrain database of _Drosophila_ neurons; see the project overview [here](https://www.janelia.org/project-team/flyem/hemibrain).To use Hemibrain, simply unzip the file `hemibrainSkeletons.zip` and copy the results to the `skeletons` directory, or instead copy your own SWC files to that directory.
 
 ## Usage
 ### Prerequisites
 - Z-stack image of neurons to query; it must already have undergone registration, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/).
-- Coordinates in µm of the point in the brain shown here, namely, the center of the negative space between the ellipsoid body and the nodulus, with respect to the upper left corner of the scanned image.
-  - For images registered to the template [FCWB](http://natverse.org/nat.flybrains/reference/FCWB.html), this point's location is (281, 105, 54).
-  - For animals other than Drosophila, an analogous reference point would need to be defined, and the constant `HEMI_ORIGIN_TO_BRAIN_CENTER` would need to be modified.
-  - ![so-called anatomical origin of the brain](anatomicalOrigin.png)
+    - Note: the Hemibrain target neurons have been transformed to the [`JRC 2018 central brain Female` template](https://www.janelia.org/open-science/jrc-2018-brain-templates); if your registration used a different template, then it is necessary to transform either your image or the skelet
 ### Steps
-1. Annotate a neuron from your image.
+1. Register your brain image stack to a template image, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/)
+    - Note: for Hemibrain, the [JRC 2018 central brain Female](https://www.janelia.org/open-science/jrc-2018-brain-templates) template is recommended because the target neurons in `hemibrainSkeletons.zip` have already been transformed to align with it.
+    - If you use a different template for your registration, then either your image or your annotated skeleton needs to be transformed to the above-mentioned template, using CMTK or the scripts in the repo [`saalfeldlab/template-building`](https://github.com/saalfeldlab/template-building).
+2. Annotate a neuron from your image.
     - [Simple Neurite Tracer](https://imagej.net/Simple_Neurite_Tracer) (plugin of [ImageJ](https://imagej.net/Welcome) or [Fiji](https://fiji.sc/)) is recommended, but any tool works as long as it outputs an SWC file.
-2. Run NBLAST search.
-    - Example: `python findNeuronMatches.py -q ${YOUR_SWC_FILE} --anatO 281,105,54`
+3. Run NBLAST search.
+    - Example: `python findNeuronMatches.py ${YOUR_SWC_FILE}`
     - Use `-h` argument for full documentation of options
-    - Note: if you are using Hemibrain and your query neuron is on the right-hand side, then use the `--reflectX` option. Hemibrain only covers the blue region in the image below, and so it is necessary in this case to search for your query neuron's left-handed analogous pair. 
+    - Note: Hemibrain only covers the blue region in the image below, and so if your query neuron is on the right-hand side, then use the `--reflectX` option to search for your query neuron's left-handed analogous pair.
     - ![Hemibrain dataset highlighted blue](https://www.janelia.org/sites/default/files/hemibrain_logo-gray-322x227.png)
-3. Inspect results.
+4. Inspect results.
     - The search script outputs a JSON file assigning a score to each target neuron in the target database, with a higher score implying a better match with the query neuron.
     - For Hemibrain search:
       - Visit Hemibrain's [neuPrintExplorer](https://neuprint.janelia.org/?dataset=hemibrain:v1.0.1&qt=findneurons).
