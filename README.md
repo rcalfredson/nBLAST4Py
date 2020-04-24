@@ -25,10 +25,6 @@ Either create a virtualenv using the given Pipfile and [`pipenv`](https://github
 This project was originally designed for use with the Hemibrain database of _Drosophila_ neurons; see the project overview [here](https://www.janelia.org/project-team/flyem/hemibrain).To use Hemibrain, simply unzip the file `hemibrainSkeletons.zip` and copy the results to the `skeletons` directory, or instead copy your own SWC files to that directory.
 
 ## Usage
-### Prerequisites
-- Z-stack image of neurons to query; it must already have undergone registration, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/).
-    - Note: the Hemibrain target neurons have been transformed to the [`JRC 2018 central brain Female` template](https://www.janelia.org/open-science/jrc-2018-brain-templates); if your registration used a different template, then it is necessary to transform either your image or the skelet
-### Steps
 1. Register your brain image stack to a template image, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/)
     - Note: for Hemibrain, the [JRC 2018 central brain Female](https://www.janelia.org/open-science/jrc-2018-brain-templates) template is recommended because the target neurons in `hemibrainSkeletons.zip` have already been transformed to align with it.
     - If you use a different template for your registration, then either your image or your annotated skeleton needs to be transformed to the above-mentioned template, using CMTK or the scripts in the repo [`saalfeldlab/template-building`](https://github.com/saalfeldlab/template-building).

@@ -6,6 +6,7 @@ import timeit
 import sys
 
 from common import globFiles
+from largestNeurons import largest_neurons
 from swcHelper import SWCHelper
 from nblast import NBLASTHelper
 
@@ -40,6 +41,9 @@ def runSearch():
   print('skel Z coords:', query.z)
   nblast = NBLASTHelper(query)
   scores = nblast.calculateMatchScores(targets)
+  for i, target in enumerate(targets):
+    if os.path.basename(target) in largest_neurons:
+      targets[i] = "%s (note: is among 100 largest Hemibrain neurons)"%targets[i]
   if opts.normalize:
     scores = scores / np.max(scores)
   with open('nblast_results_%s.json'%os.path.splitext(os.path.basename(
