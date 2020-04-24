@@ -19,8 +19,9 @@ def options():
     'the target neurons (default: skeletons sub-folder)', default='skeletons')
   p.add_argument('--rescale', help='rescale coordinates of query neuron by ' +
     'the given factor', type=float)
-  p.add_argument('--reflectX', dest='reflectX', action='store_true',
-    help='flip sign of X coords of the query neuron (reflect across Y axis.')
+  p.add_argument('--reflectX', help='flip sign of X coords of the query neuron ' +
+    'by reflecting across the inputted X midpoint of the brain (e.g., 314 ' +
+    ' microns for JRC2018F).', type=float)
   p.add_argument('-n', dest='normalize', action='store_true', default=False,
     help='whether to normalize the NBLAST scores (default: False)')
   return p.parse_args()
@@ -32,7 +33,7 @@ def runSearch():
   if opts.rescale:
     query.rescale(opts.rescale)
   if opts.reflectX:
-    query.reflectX()
+    query.reflectX(midpoint=opts.reflectX)
   targets = globFiles(opts.dir, 'swc')
   print('skel X coords:', query.x)
   print('skel Y coords:', query.y)

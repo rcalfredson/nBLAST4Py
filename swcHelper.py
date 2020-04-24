@@ -52,9 +52,9 @@ class SWCHelper:
     for attr in ('x', 'y', 'z'):
       setattr(self, attr, np.multiply(getattr(self, attr), scalingFactor))
 
-  def reflectX(self):
+  def reflectX(self, midpoint=None):
     """Flip the sign of X coordinates (reflect across Y axis)."""
-    self.x = np.multiply(self.x, -1)
+    self.x = np.multiply(self.x, -1) if midpoint is None else np.subtract(2*midpoint, self.x)
 
   def numpy(self):
     """Return the skeleton as an N-by-3 matrix (XYZ tuple for each node)"""

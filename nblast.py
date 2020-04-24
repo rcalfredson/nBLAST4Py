@@ -24,6 +24,7 @@ class NBLASTHelper():
     scores = []
     for i, target in enumerate(targets):
       start_time = timeit.default_timer()
+      #target_name = target
       target = SWCHelper(target)
       nns = target.tree.knn(self.qNumpy, 1, 0,
         SearchOptionFlags.ALLOW_SELF_MATCH)
@@ -31,6 +32,7 @@ class NBLASTHelper():
         .reshape(-1, 1)))
       dists = np.sqrt(np.squeeze(nns[1]))
       # idx = list(dists).index(min(dists))
+      # print('checking target', target_name)
       # print('min distance:', dists[idx])
       # print('points:', nnIdxs[idx])
       # print('query:', self.query.x[nnIdxs[idx][1]], self.query.y[nnIdxs[idx][1]], self.query.z[nnIdxs[idx][1]])
