@@ -31,7 +31,7 @@ class ValidCallsToScript(unittest.TestCase):
   @patch('swcHelper.SWCHelper.reflectX')
   def testCallsReflectXAsNeeded(self, reflectX_mock, *args):
     """Ensure SWCHelper.reflectX() gets called if --reflectX flag is present."""
-    with patch.object(sys, 'argv', ['', 'mockQ.swc', '--reflectX']):
+    with patch.object(sys, 'argv', ['', 'mockQ.swc', '--reflectX', '3']):
       findNeuronMatches.runSearch()
       assert len(reflectX_mock.call_args_list) == 1
 

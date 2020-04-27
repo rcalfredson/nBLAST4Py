@@ -5,6 +5,7 @@ htmlcov/*
 .vscode/*
 skeletons/*.swc
 skeletons/*.pickskel
+tests/data/**/*.pickSkel
 nblast_results_*
 Pipfile.lock
 __pycache__
