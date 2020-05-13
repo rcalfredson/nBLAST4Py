@@ -10,9 +10,10 @@ from swcHelper import SWCHelper
 class NBLASTHelper():
   """Calculate neuron morphology scores using NBLAST."""
 
-  def __init__(self, query):
+  def __init__(self, query, dirVectorFromParent=False):
     """Create a k-d tree for the given query neuron."""
     self.query = query
+    self.dirVectorFromParent = dirVectorFromParent
     self.qNumpy = np.asfortranarray(query.numpy().astype(np.float64))
     self.scoreMatrix = feather.read_dataframe('data/fcwb.feather')
 
@@ -24,25 +25,17 @@ class NBLASTHelper():
     scores = []
     for i, target in enumerate(targets):
       start_time = timeit.default_timer()
-      #target_name = target
       target = SWCHelper(target)
-      nns = target.tree.knn(self.qNumpy, 1, 0,
+      nns = target.tree.knn(self.qNumpy.T, 1, 0,
         SearchOptionFlags.ALLOW_SELF_MATCH)
       nnIdxs = np.hstack((nns[0], np.array(range(self.query.numPts))
         .reshape(-1, 1)))
       dists = np.sqrt(np.squeeze(nns[1]))
-      # idx = list(dists).index(min(dists))
-      # print('checking target', target_name)
-      # print('min distance:', dists[idx])
-      # print('points:', nnIdxs[idx])
-      # print('query:', self.query.x[nnIdxs[idx][1]], self.query.y[nnIdxs[idx][1]], self.query.z[nnIdxs[idx][1]])
-      # print('target:', target.x[nnIdxs[idx][0]], target.y[nnIdxs[idx][0]], target.z[nnIdxs[idx][0]])
-      # fig = plt.figure()
-      # ax = fig.add_subplot(111, projection='3d')
-      # ax.plot(self.query.x, self.query.y, zs=self.query.z)
-      # ax.plot(target.x, target.y, zs=target.z)
-      # plt.show()
-      dirVectors = self.findDirectionVectorsFromParents(target, nnIdxs)
+      if self.dirVectorFromParent:
+        dirVectors = self.findDirectionVectorsFromParents(target, nnIdxs)
+      else:
+        dirVectors = np.hstack((target.dirVectors[nnIdxs[:, 0]],
+          self.query.dirVectors[nnIdxs[:, 1]]))
       dotProds = np.abs(np.einsum('ij,ij->i', dirVectors[:, 0:3],
         dirVectors[:, 3:6]))
       scores.append(self.calculateNearestNeighborScore(dists, dotProds))
@@ -69,13 +62,9 @@ class NBLASTHelper():
         if rI == len(catsByType[tI]) - 1:
           rangeType.append(catRange[1])
     distanceRanges = np.array(distanceRanges)
-    #print('dotProd ranges:', dotProdRanges)
     dotProdRanges = np.array(dotProdRanges)
     distBins = np.histogram2d(dists, np.array(dotProds),
       bins=np.array([distanceRanges, dotProdRanges]))[0]
-    # print('scoreTable:', scoreTable)
-    # print(scoreTable.shape)
-    # print('scoreTable before reshaping:', self.scoreMatrix['Freq'])
     return np.sum(np.multiply(distBins, scoreTable))
 
   def findDirectionVectorsFromParents(self, target, nnIdxs):

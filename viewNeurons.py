@@ -13,20 +13,24 @@ def options():
     ' returns a match score for every neuron in the Hemibrain database.')
   p.add_argument('swcs', help='comma-separated paths to SWC files of neurons' +
     ' to view')
+  p.add_argument('--reflectX', help='flip sign of X coords of the first ' +
+    'inputted neuron by reflecting across the inputted X midpoint of the ' +
+    'brain (e.g., 314 microns for JRC2018F).', type=float)
   return p.parse_args()
 
 opts = options()
 swcPaths, swcs = opts.swcs.split(','), []
 print('SWCs:', opts.swcs) 
-for swcPath in swcPaths:
+for pathI, swcPath in enumerate(swcPaths):
   swcs.append(SWCHelper(swcPath))
+  if pathI == 0 and opts.reflectX is not None:
+    swcs[-1].reflectX(opts.reflectX)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-for swc in swcs:
-  ax.scatter(swc.x, swc.y, zs=swc.z)
-# XYZ
-ax.plot([258, 258], [85, 85], zs=[20, 74], c='r', marker='*', linewidth=5)
+for swcI, swc in enumerate(swcs):
+  ax.scatter(swc.x, swc.y, zs=swc.z, label=os.path.basename(swcPaths[swcI]))
+ax.plot([258, 290], [85, 85], zs=[74, 74], c='r', marker='*', linewidth=5)
 ax.scatter([258], [30], zs=[74], c='r', marker='p', s=200)
 ax.scatter([270], [128], zs=[43], c='r', marker='x', s=200)
-plt.legend([os.path.basename(swcPath) for swcPath in swcPaths])
+plt.legend()
 plt.show()

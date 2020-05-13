@@ -23,6 +23,10 @@ def options():
   p.add_argument('--reflectX', help='flip sign of X coords of the query neuron ' +
     'by reflecting across the inputted X midpoint of the brain (e.g., 314 ' +
     ' microns for JRC2018F).', type=float)
+  p.add_argument('--dirVec', default='nn', help='specify method used to ' +
+    'calculate direction vectors of points along skeleton. Values: 1) nn for ' +
+    '5-point nearest neighbor singular value decomposition with resampling or '+
+    '2) parent for direction vectors pointing to each point from its parent.')
   p.add_argument('-n', dest='normalize', action='store_true', default=False,
     help='whether to normalize the NBLAST scores (default: False)')
   return p.parse_args()
@@ -36,10 +40,7 @@ def runSearch():
   if opts.reflectX:
     query.reflectX(midpoint=opts.reflectX)
   targets = globFiles(opts.dir, 'swc')
-  print('skel X coords:', query.x)
-  print('skel Y coords:', query.y)
-  print('skel Z coords:', query.z)
-  nblast = NBLASTHelper(query)
+  nblast = NBLASTHelper(query, dirVectorFromParent=opts.dirVec=='parent')
   scores = nblast.calculateMatchScores(targets)
   for i, target in enumerate(targets):
     if os.path.basename(target) in largest_neurons:
