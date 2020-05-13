@@ -10,7 +10,7 @@ from pynabo import NearestNeighbourSearch, SearchOptionFlags
 class SWCHelper:
   """Read SWC files."""
 
-  def __init__(self, path, dirVectorFromParent=False):
+  def __init__(self, path, dirVectorFromParent=False, reflectX=None):
     """Read an SWC file from the given path."""
     self.path = path
     self.x, self.y, self.z, self.parents, self.ids = [], [], [], [], []
@@ -29,6 +29,8 @@ class SWCHelper:
         for attr in ('parents', 'x', 'y', 'z'):
           setattr(self, attr, np.array(getattr(self, attr)))
         self.numPts = len(self.x)
+        if reflectX is not None:
+          self.reflectX(reflectX)
         if not dirVectorFromParent:
           self.constructSegments()
           self.resample(1)

@@ -34,13 +34,13 @@ def options():
 startT = timeit.default_timer()
 def runSearch():
   opts = options()
-  query = SWCHelper(opts.query)
+  useParent = opts.dirVec=='parent'
+  query = SWCHelper(opts.query, dirVectorFromParent=useParent,
+    reflectX=opts.reflectX)
   if opts.rescale:
     query.rescale(opts.rescale)
-  if opts.reflectX:
-    query.reflectX(midpoint=opts.reflectX)
   targets = globFiles(opts.dir, 'swc')
-  nblast = NBLASTHelper(query, dirVectorFromParent=opts.dirVec=='parent')
+  nblast = NBLASTHelper(query, dirVectorFromParent=useParent)
   scores = nblast.calculateMatchScores(targets)
   for i, target in enumerate(targets):
     if os.path.basename(target) in largest_neurons:
