@@ -27,6 +27,9 @@ def options():
     'calculate direction vectors of points along skeleton. Values: 1) nn for ' +
     '5-point nearest neighbor singular value decomposition with resampling or '+
     '2) parent for direction vectors pointing to each point from its parent.')
+  p.add_argument('--fwdRev', action='store_true', default=False,
+    help='whether to average the forward and reverse NBLAST results (swapping' +
+    'role of query and target neuron)')
   p.add_argument('-n', dest='normalize', action='store_true', default=False,
     help='whether to normalize the NBLAST scores (default: False)')
   return p.parse_args()
@@ -40,7 +43,8 @@ def runSearch():
   if opts.rescale:
     query.rescale(opts.rescale)
   targets = globFiles(opts.dir, 'swc')
-  nblast = NBLASTHelper(query, dirVectorFromParent=useParent)
+  nblast = NBLASTHelper(query, dirVectorFromParent=useParent,
+    fwdRevAvg=opts.fwdRev)
   scores = nblast.calculateMatchScores(targets)
   for i, target in enumerate(targets):
     if os.path.basename(target) in largest_neurons:

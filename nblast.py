@@ -1,5 +1,5 @@
 """NBLASTHelper class"""
-import timeit
+import timeit, os, sys
 import numpy as np
 import matplotlib.pyplot as plt
 from pynabo import SearchOptionFlags
@@ -10,12 +10,36 @@ from swcHelper import SWCHelper
 class NBLASTHelper():
   """Calculate neuron morphology scores using NBLAST."""
 
-  def __init__(self, query, dirVectorFromParent=False):
+  def __init__(self, query, dirVectorFromParent=False, fwdRevAvg=False):
     """Create a k-d tree for the given query neuron."""
     self.query = query
     self.dirVectorFromParent = dirVectorFromParent
+    self.fwdRevAvg = fwdRevAvg
     self.qNumpy = np.asfortranarray(query.numpy().astype(np.float64))
     self.scoreMatrix = feather.read_dataframe('data/fcwb.feather')
+
+  def runNBLASTForPair(self, target, query=None, reverse=False,
+      normFactor=None):
+    if query is None:
+      query = self.query
+    if reverse:
+      target_new = query
+      query = target
+      target = target_new
+    nns = target.tree.knn(np.asfortranarray(query.numpy().astype(np.float64)).T,
+      1, 0, SearchOptionFlags.ALLOW_SELF_MATCH)
+    nnIdxs = np.hstack((nns[0], np.array(range(query.numPts))
+      .reshape(-1, 1)))
+    dists = np.sqrt(np.squeeze(nns[1]))
+    if self.dirVectorFromParent:
+      dirVectors = self.findDirectionVectorsFromParents(target, nnIdxs)
+    else:
+      dirVectors = np.hstack((target.dirVectors[nnIdxs[:, 0]],
+        query.dirVectors[nnIdxs[:, 1]]))
+    dotProds = np.abs(np.einsum('ij,ij->i', dirVectors[:, 0:3],
+      dirVectors[:, 3:6]))
+    myScore = self.calculateNearestNeighborScore(dists, dotProds)
+    return myScore / (1 if normFactor is None else normFactor)
 
   def calculateMatchScores(self, targets):
     """Return an array of similarity scores with the query neuron for each
@@ -23,22 +47,19 @@ class NBLASTHelper():
     (doi: 10.1016/j.neuron.2016.06.012)
     """
     scores = []
+    if self.fwdRevAvg:
+      identityScores = [self.runNBLASTForPair(self.query)]
     for i, target in enumerate(targets):
       start_time = timeit.default_timer()
       target = SWCHelper(target)
-      nns = target.tree.knn(self.qNumpy.T, 1, 0,
-        SearchOptionFlags.ALLOW_SELF_MATCH)
-      nnIdxs = np.hstack((nns[0], np.array(range(self.query.numPts))
-        .reshape(-1, 1)))
-      dists = np.sqrt(np.squeeze(nns[1]))
-      if self.dirVectorFromParent:
-        dirVectors = self.findDirectionVectorsFromParents(target, nnIdxs)
+      if self.fwdRevAvg:
+        identityScores.append(self.runNBLASTForPair(target, query=target))
+        scores.append(0.5*(self.runNBLASTForPair(target, reverse=True,
+          normFactor=identityScores[-1]) +
+          self.runNBLASTForPair(target, reverse=False,
+          normFactor=identityScores[0])))
       else:
-        dirVectors = np.hstack((target.dirVectors[nnIdxs[:, 0]],
-          self.query.dirVectors[nnIdxs[:, 1]]))
-      dotProds = np.abs(np.einsum('ij,ij->i', dirVectors[:, 0:3],
-        dirVectors[:, 3:6]))
-      scores.append(self.calculateNearestNeighborScore(dists, dotProds))
+        scores.append(self.runNBLASTForPair(target))
       if i % 1000 == 0:
         print(i, 'of', len(targets))
         print('score for %s: %.4f  |  processing time: %.4f'%(target.path,
@@ -63,6 +84,7 @@ class NBLASTHelper():
           rangeType.append(catRange[1])
     distanceRanges = np.array(distanceRanges)
     dotProdRanges = np.array(dotProdRanges)
+    dotProds = np.round(dotProds, decimals=5)
     distBins = np.histogram2d(dists, np.array(dotProds),
       bins=np.array([distanceRanges, dotProdRanges]))[0]
     return np.sum(np.multiply(distBins, scoreTable))

@@ -2,6 +2,7 @@
 report.html
 assets/*
 htmlcov/*
+skelDebug/*
 .vscode/*
 skeletons/*.swc
 skeletons/*.pickskel
