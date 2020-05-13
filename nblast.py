@@ -1,5 +1,5 @@
 """NBLASTHelper class"""
-import timeit, os, sys
+import timeit
 import numpy as np
 import matplotlib.pyplot as plt
 from pynabo import SearchOptionFlags
