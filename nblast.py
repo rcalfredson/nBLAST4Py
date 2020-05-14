@@ -10,11 +10,13 @@ from swcHelper import SWCHelper
 class NBLASTHelper():
   """Calculate neuron morphology scores using NBLAST."""
 
-  def __init__(self, query, dirVectorFromParent=False, fwdRevAvg=False):
+  def __init__(self, query, dirVectorFromParent=False, fwdRevAvg=False,
+      normalize=False):
     """Create a k-d tree for the given query neuron."""
     self.query = query
     self.dirVectorFromParent = dirVectorFromParent
     self.fwdRevAvg = fwdRevAvg
+    self.normalize = normalize
     self.qNumpy = np.asfortranarray(query.numpy().astype(np.float64))
     self.scoreMatrix = feather.read_dataframe('data/fcwb.feather')
 
@@ -47,19 +49,20 @@ class NBLASTHelper():
     (doi: 10.1016/j.neuron.2016.06.012)
     """
     scores = []
-    if self.fwdRevAvg:
+    if self.fwdRevAvg or self.normalize:
       identityScores = [self.runNBLASTForPair(self.query)]
     for i, target in enumerate(targets):
       start_time = timeit.default_timer()
       target = SWCHelper(target)
-      if self.fwdRevAvg:
+      if self.fwdRevAvg and not self.normalize:
         identityScores.append(self.runNBLASTForPair(target, query=target))
         scores.append(0.5*(self.runNBLASTForPair(target, reverse=True,
           normFactor=identityScores[-1]) +
           self.runNBLASTForPair(target, reverse=False,
           normFactor=identityScores[0])))
       else:
-        scores.append(self.runNBLASTForPair(target))
+        scores.append(self.runNBLASTForPair(target,
+          normFactor=identityScores[-1] if self.normalize else 1))
       if i % 1000 == 0:
         print(i, 'of', len(targets))
         print('score for %s: %.4f  |  processing time: %.4f'%(target.path,

@@ -44,13 +44,11 @@ def runSearch():
     query.rescale(opts.rescale)
   targets = globFiles(opts.dir, 'swc')
   nblast = NBLASTHelper(query, dirVectorFromParent=useParent,
-    fwdRevAvg=opts.fwdRev)
+    fwdRevAvg=opts.fwdRev, normalize=opts.normalize)
   scores = nblast.calculateMatchScores(targets)
   for i, target in enumerate(targets):
     if os.path.basename(target) in largest_neurons:
       targets[i] = "%s (note: is among 100 largest Hemibrain neurons)"%targets[i]
-  if opts.normalize:
-    scores = scores / np.max(scores)
   with open('nblast_results_%s.json'%os.path.splitext(os.path.basename(
       opts.query))[0], 'w', encoding='utf-8') as f:
     json.dump(sorted(list(zip(targets, scores)), key=lambda x: x[1],
