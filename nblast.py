@@ -54,7 +54,7 @@ class NBLASTHelper():
     for i, target in enumerate(targets):
       start_time = timeit.default_timer()
       target = SWCHelper(target)
-      if self.fwdRevAvg and not self.normalize:
+      if self.fwdRevAvg:
         identityScores.append(self.runNBLASTForPair(target, query=target))
         scores.append(0.5*(self.runNBLASTForPair(target, reverse=True,
           normFactor=identityScores[-1]) +
