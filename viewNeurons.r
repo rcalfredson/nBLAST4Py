@@ -1,0 +1,26 @@
+library(here)
+library(rgl)
+library(nat.jrcbrains)
+
+al_R = readOBJ("..\\nBLAST4Py\\brainSurfaces\\al_r.obj")
+alPrime_R = readOBJ("..\\nBLAST4Py\\brainSurfaces\\alPrime_r.obj")
+bl_R = readOBJ("..\\nBLAST4Py\\brainSurfaces\\bl_r.obj")
+blPrime_R = readOBJ("..\\nBLAST4Py\\brainSurfaces\\blPrime_r.obj")
+EB = readOBJ("..\\nBLAST4Py\\brainSurfaces\\EB.obj")
+lh_R = readOBJ("..\\nBLAST4Py\\brainSurfaces\\lh_R.obj")
+targetNeuronPath = "..\\nBLAST4Py\\skeletons\\5812980444.swc"
+queryNeuronPath = "C:\\Users\\Tracking\\nblast-data\\fc_ppl1\\TH-F-000018.swc"
+targetNeuron = read.neuron(targetNeuronPath)
+queryNeuron = read.neuron(queryNeuronPath)
+open3d()
+plot3d(targetNeuron, col='magenta', add=TRUE)
+plot3d(queryNeuron, col='cyan', add=TRUE)
+plot3d(al_R, col='blue', add=TRUE, alpha=0.4)
+plot3d(alPrime_R, col='green', add=TRUE, alpha=0.4)
+plot3d(bl_R, col='orange', add=TRUE, alpha=0.4)
+plot3d(blPrime_R, col='red', add=TRUE, alpha=0.4)
+plot3d(EB, col='yellow', add=TRUE, alpha=0.4)
+plot3d(lh_R, col='yellow', add=TRUE, alpha=0.4)
+decorate3d(axes=TRUE)
+legend3d("topright", legend = paste('Type', c(tail(strsplit(targetNeuronPath, "\\\\")[[1]], n=1),
+  tail(strsplit(queryNeuronPath, "\\\\")[[1]], n=1))), pch = 16, col = c("magenta", "cyan"), cex=1, inset=c(0.02))

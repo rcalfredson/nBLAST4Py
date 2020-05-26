@@ -3,6 +3,9 @@
 import argparse, os
 
 import matplotlib.pyplot as plt
+import trimesh
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D, art3d
 
 from swcHelper import SWCHelper
 
@@ -32,5 +35,16 @@ for swcI, swc in enumerate(swcs):
 ax.plot([258, 290], [85, 85], zs=[74, 74], c='r', marker='*', linewidth=5)
 ax.scatter([258], [30], zs=[74], c='r', marker='p', s=200)
 ax.scatter([270], [128], zs=[43], c='r', marker='x', s=200)
+# brainSurfaces = ('al_R', 'alPrime_R', 'bl_R', 'blPrime_R', 'EB', 'lh_R')
+# colors = ('b', 'springgreen', 'y', 'darkorange', 'r', 'magenta')
+# for sI, surfName in enumerate(brainSurfaces):
+#   surf = trimesh.load("C:\\Users\\Tracking\\nblast-data\\brainSurfaces\\transformed\\%s.obj"%surfName)
+#   v = np.array(surf.vertices)
+#   f = np.array(surf.faces)
+#   pc = art3d.Poly3DCollection(v[f], alpha=0.4)
+#   pc.set_facecolor(colors[sI])
+#   ax.add_collection(pc)
+# ax.view_init(elev=-90., azim=-90)
+# ax.set_xlim(160)
 plt.legend()
 plt.show()

@@ -49,8 +49,8 @@ def runSearch():
   for i, target in enumerate(targets):
     if os.path.basename(target) in largest_neurons:
       targets[i] = "%s (note: is among 100 largest Hemibrain neurons)"%targets[i]
-  with open('nblast_results_%s.json'%os.path.splitext(os.path.basename(
-      opts.query))[0], 'w', encoding='utf-8') as f:
+  with open('nblast_results_%s%s.json'%(os.path.splitext(os.path.basename(
+      opts.query))[0], "_fwdRev" if opts.fwdRev else ""), 'w', encoding='utf-8') as f:
     json.dump(sorted(list(zip(targets, scores)), key=lambda x: x[1],
       reverse=True), f, ensure_ascii=False, indent=4)
   print('total compute time:', timeit.default_timer() - startT)
