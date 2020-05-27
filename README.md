@@ -23,6 +23,10 @@ Again, the [GitHub repository](https://github.com/ethz-asl/libnabo#compilation) 
 Either create a virtualenv using the given Pipfile and [`pipenv`](https://github.com/pypa/pipenv), or simply install `numpy`, `feather-format`, and `pandas` system-wide using `pip`.
 ### Populate `skeletons` directory with SWC files
 This project was originally designed for use with the Hemibrain database of _Drosophila_ neurons; see the project overview [here](https://www.janelia.org/project-team/flyem/hemibrain).To use Hemibrain, simply unzip the file `hemibrainSkeletons.zip` and copy the results to the `skeletons` directory, or instead copy your own SWC files to that directory.
+### Install R and dependencies (optional)
+R is used for generating 3D images comparing the query neuron to its top 4 matches, using the `--visualComp` option of `findNeuronMatches.py`. The easiest way to install R is via a pre-compiled binary on [this page](https://cran.r-project.org/), after which the following packages are required: [`here`](https://github.com/krlmlr/here), [`rgl`](https://r-forge.r-project.org/projects/rgl/), [`nat`](https://github.com/natverse/nat), [`nat.jrcbrains`](https://github.com/natverse/nat.jrcbrains), [`imager`](http://dahtah.github.io/imager/), and [`argparser`](https://bitbucket.org/djhshih/argparser/src/master/).
+
+After installation, add the R `bin` directory to your system path and confirm that the program `Rscript` works from a command line.
 
 ## Usage
 1. Register your brain image stack to a template image, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/)
@@ -38,7 +42,8 @@ This project was originally designed for use with the Hemibrain database of _Dro
 4. Inspect results.
     - The search script outputs a JSON file assigning a score to each target neuron in the target database, with a higher score implying a better match with the query neuron.
     - For Hemibrain search:
-      - Visit Hemibrain's [neuPrintExplorer](https://neuprint.janelia.org/?dataset=hemibrain:v1.0.1&qt=findneurons).
+      - Use the flag `--visualComp` to obtain 3D plots superimposing the query and target skeletons along with 3D anantomical landmarks. As noted above, using this feature requires an R installation.
+      - Alternatively, visit Hemibrain's [neuPrintExplorer](https://neuprint.janelia.org/?dataset=hemibrain:v1.0.1&qt=findneurons).
       - Click the search icon (magnifying glass) in the left-hand sidebar, and copy and paste the numeric ID of a skeleton from the results file (e.g., 204962969); click on the result that appears under the header "Body IDs," of which there should be only one.
       - In the table of results, click the small eye icon beside the neuron ID and two visualizers will appear: Neuroglancer, which superimposes the skeleton and synapses of the neuron against the raw Hemibrain image data, and a simple skeleton viewer. The former is essential to determine whether the target neuron is located in the expected region of the brain.
       - ![Hemibrain button to activate visualizer](visualizeButton.png)
