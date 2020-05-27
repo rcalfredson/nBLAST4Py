@@ -1,5 +1,5 @@
 """NBLASTHelper class"""
-import timeit
+import os, timeit
 import numpy as np
 import matplotlib.pyplot as plt
 from pynabo import SearchOptionFlags
@@ -17,6 +17,7 @@ class NBLASTHelper():
     self.dirVectorFromParent = dirVectorFromParent
     self.fwdRevAvg = fwdRevAvg
     self.normalize = normalize
+    self.logPrefix = os.path.basename('%s:'%self.query.path)
     self.qNumpy = np.asfortranarray(query.numpy().astype(np.float64))
     self.scoreMatrix = feather.read_dataframe('data/fcwb.feather')
 
@@ -64,10 +65,10 @@ class NBLASTHelper():
         scores.append(self.runNBLASTForPair(target,
           normFactor=identityScores[-1] if self.normalize else 1))
       if i % 1000 == 0:
-        print(i, 'of', len(targets))
-        print('score for %s: %.4f  |  processing time: %.4f'%(target.path,
-          scores[-1], timeit.default_timer() - start_time))
-        print('num scores greater than zero:',
+        print(self.logPrefix, i, 'of', len(targets))
+        print(self.logPrefix, 'score for %s: %.4f  |  processing time: %.4f'%(
+          target.path, scores[-1], timeit.default_timer() - start_time))
+        print(self.logPrefix, 'num scores greater than zero:',
           len([score for score in scores if score > 0]))
     return scores
 

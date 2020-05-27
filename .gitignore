@@ -2,6 +2,7 @@
 report.html
 assets/*
 htmlcov/*
+imgs/*
 skelDebug/*
 .vscode/*
 skeletons/*.swc

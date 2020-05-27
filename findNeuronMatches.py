@@ -1,9 +1,10 @@
 """Conduct NBLAST search"""
 
-import argparse, json, os
+import argparse, json, os, random
 import numpy as np
 import timeit
-import sys
+import subprocess, sys
+from multiprocessing import Pool as ThreadPool
 
 from common import globFiles
 from largestNeurons import largest_neurons
@@ -15,9 +16,20 @@ def options():
   p = argparse.ArgumentParser(description=
     'Runs NBLAST search for a given query neuron skeleton (in SWC format) and' +
     ' returns a match score for every neuron in the Hemibrain database.')
-  p.add_argument('query', help='path to SWC file for the query neuron')
-  p.add_argument('-d', dest='dir', help='path to directory of SWC files of ' +
-    'the target neurons (default: skeletons sub-folder)', default='skeletons')
+  p.add_argument('query', help='path to SWC file for the query neuron or ' +
+    'directory of SWC files to query')
+  p.add_argument('-qL', help='path to newline-separated text file listing ' +
+    'skeletons to query if "query" arg is a directory; if qL is omitted, then' +
+    ' every SWC file in the query directory will be used')
+  p.add_argument('-tD', help='path to directory of SWC files of the target ' +
+    'neurons (default: skeletons sub-folder)', default='skeletons')
+  p.add_argument('--nThreads', help='number of threads to use for ' +
+    'simultaneous NBLAST searches of different query neurons (note: only ' +
+    'decreases processing time if you have multiple query neurons, i.e., the ' +
+    'duration of each individual search does not decrease)',
+    type=int, default=1)
+  p.add_argument('--visualComp', type=bool, default=False, help='output ' +
+    'visual comparisons between the query neuron and the top 4 target neurons')
   p.add_argument('--rescale', help='rescale coordinates of query neuron by ' +
     'the given factor', type=float)
   p.add_argument('--reflectX', help='flip sign of X coords of the query neuron ' +
@@ -35,24 +47,58 @@ def options():
   return p.parse_args()
 
 startT = timeit.default_timer()
+
+def runSingleThreadSearch(args):
+  queries, opts = args
+  useParent = opts.dirVec=='parent'
+  for query in queries:
+    print('Running query for', query)
+    query = SWCHelper(query, dirVectorFromParent=useParent,
+      reflectX=opts.reflectX)
+    if opts.rescale:
+      query.rescale(opts.rescale)
+    targets = globFiles(opts.tD, 'swc')
+    random.shuffle(targets)
+    nblast = NBLASTHelper(query, dirVectorFromParent=useParent,
+      fwdRevAvg=opts.fwdRev, normalize=opts.normalize)
+    scores = nblast.calculateMatchScores(targets)
+    sortedScores = sorted(list(zip(targets, scores)), key=lambda x: x[1],
+        reverse=True)
+    if opts.visualComp:
+      for ss in sortedScores[0:4]:
+        my_env = os.environ.copy()
+        my_env["PATH"] = my_env["PATH"]
+        subprocess.call(["Rscript", "--vanilla", "viewNeurons.r", ss[0],
+          query.path], shell=True, env=my_env)
+    for i, ss in enumerate(sortedScores):
+      if os.path.basename(ss[0]) in largest_neurons:
+        sortedScores[i] = ("%s (note: is among 100 largest Hemibrain neurons)"%(
+          sortedScores[i][0], ss[1]))
+    with open('nblast_results_%s%s.json'%(os.path.splitext(os.path.basename(
+        query.path))[0], "_fwdRev" if opts.fwdRev else ""), 'w',
+        encoding='utf-8') as f:
+      json.dump(sortedScores, f, ensure_ascii=False, indent=4)
+
 def runSearch():
   opts = options()
-  useParent = opts.dirVec=='parent'
-  query = SWCHelper(opts.query, dirVectorFromParent=useParent,
-    reflectX=opts.reflectX)
-  if opts.rescale:
-    query.rescale(opts.rescale)
-  targets = globFiles(opts.dir, 'swc')
-  nblast = NBLASTHelper(query, dirVectorFromParent=useParent,
-    fwdRevAvg=opts.fwdRev, normalize=opts.normalize)
-  scores = nblast.calculateMatchScores(targets)
-  for i, target in enumerate(targets):
-    if os.path.basename(target) in largest_neurons:
-      targets[i] = "%s (note: is among 100 largest Hemibrain neurons)"%targets[i]
-  with open('nblast_results_%s%s.json'%(os.path.splitext(os.path.basename(
-      opts.query))[0], "_fwdRev" if opts.fwdRev else ""), 'w', encoding='utf-8') as f:
-    json.dump(sorted(list(zip(targets, scores)), key=lambda x: x[1],
-      reverse=True), f, ensure_ascii=False, indent=4)
+  qIsFile, qIsDir = os.path.isfile(opts.query), os.path.isdir(opts.query)
+  if not qIsDir and not qIsFile:
+    print('Query must be a file or directory')
+    sys.exit()
+  if qIsFile:
+    queries = [opts.query]
+  elif qIsDir and not opts.qL:
+    queries = globFiles(opts.query, 'swc')
+  else:
+    with open(opts.qL, 'rt') as queryList:
+      neurons = queryList.read().splitlines()
+      queries = [os.path.join(opts.query, neuron) for neuron in neurons]
+  nThreads = opts.nThreads
+  threadLists = [queries[i::nThreads] for i in range(nThreads)]
+  pool = ThreadPool(nThreads)
+  pool.map(runSingleThreadSearch, [[threadLists[i], opts] for i in \
+    range(nThreads)])
+
   print('total compute time:', timeit.default_timer() - startT)
 
 if __name__ == "__main__":
