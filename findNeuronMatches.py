@@ -73,7 +73,7 @@ def runSingleThreadSearch(args):
     for i, ss in enumerate(sortedScores):
       if os.path.basename(ss[0]) in largest_neurons:
         sortedScores[i] = ("%s (note: is among 100 largest Hemibrain neurons)"%(
-          sortedScores[i][0], ss[1]))
+          sortedScores[i][0]), ss[1])
     with open('nblast_results_%s%s.json'%(os.path.splitext(os.path.basename(
         query.path))[0], "_fwdRev" if opts.fwdRev else ""), 'w',
         encoding='utf-8') as f:
