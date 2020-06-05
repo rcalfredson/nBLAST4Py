@@ -106,17 +106,12 @@ class SWCHelper:
         dataPiece = int(dataPiece)
       getattr(self, attrName).append(dataPiece)
 
-  def rescale(self, scalingFactor):
-    """Multiply the coords of each node by the given factor."""
-    for attr in ('x', 'y', 'z'):
-      setattr(self, attr, np.multiply(getattr(self, attr), scalingFactor))
-
   def reflectX(self, midpoint=None):
     """Flip the sign of X coordinates (reflect across Y axis)."""
     self.x = np.multiply(self.x, -1) if midpoint is None else np.subtract(
       2*midpoint, self.x)
 
-  def resample(self, stepsize, replace=True):
+  def resample(self, stepsize):
     """Resample the skeleton with a new spacing.
   
     To replace x, y, and z attributes, use replace=True; otherwise, the
@@ -141,14 +136,10 @@ class SWCHelper:
        in sublist])
     _, idx = np.unique(segListFlatPreUniq, return_index=True)
     segListFlat = segListFlatPreUniq[np.sort(idx)]
-    if replace:
-      self.x = self.x[segListFlat]
-      self.y = self.y[segListFlat]
-      self.z = self.z[segListFlat]
-      self.numPts = len(self.x)
-    else:
-      return np.vstack((self.x[segListFlat], self.y[segListFlat],
-        self.z[segListFlat]))
+    self.x = self.x[segListFlat]
+    self.y = self.y[segListFlat]
+    self.z = self.z[segListFlat]
+    self.numPts = len(self.x)
 
   @staticmethod
   def resample_segment(segment, stepsize):
@@ -160,9 +151,6 @@ class SWCHelper:
       return None
     internalPoints = np.arange(stepsize, pathLength, stepsize)
     nInternalPoints = len(internalPoints)
-    if internalPoints[nInternalPoints - 1] == pathLength:
-      internalPoints = internalPoints[:-1]
-      nInternalPoints = len(internalPoints)
     cumLength = np.hstack(([0], np.cumsum(diffs)))
     resampled = np.zeros((segment.shape[0], nInternalPoints))
     for dim in range(segment.shape[0]):

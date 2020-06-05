@@ -31,6 +31,8 @@ def testMatchScoresCalc(swc_mock):
 @patch('nblast.SWCHelper')
 @patch('nblast.NBLASTHelper.findDirectionVectorsFromParents')
 def testFlagForDirVecsUsingParents(dirvec_mock, swc_mock, *args):
+  """Ensure the function to calculate direction vectors from parents is called
+  when the apppropriate flag is set."""
   numTargets = 4
   swc_mock.return_value = MockSkel()
   nbh = NBLASTHelper(MockSkel())
@@ -54,7 +56,7 @@ def testMatchScoresCalcFwdRev(swc_mock):
       ) == numTargets
 
 def testCalculateDirectionVectorsFromParents():
-  """Checks accuracy of calculation of direction vectors from parent to each
+  """Ensure accuracy of calculation of direction vectors from parent to each
   point of interest."""
   query = MockSkel(numPts=2)
   target = MockSkel(numPts=2)
