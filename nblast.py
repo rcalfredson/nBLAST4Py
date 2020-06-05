@@ -98,7 +98,8 @@ class NBLASTHelper():
     and the point of interest for both the query neuron and target neurons.
     """
     parentsIdxs = np.hstack((np.array(target.parents[nnIdxs[:, 0]]).reshape(
-      -1, 1), np.array(self.query.parents[nnIdxs[:, 1]]).reshape(-1, 1))) - 1
+      -1, 1), np.array(self.query.parents[nnIdxs[:, 1]]).reshape(-1, 1)))
+    parentsIdxs = np.subtract(parentsIdxs, 1, out=parentsIdxs, where=parentsIdxs>-1)
     parentToPtDists = np.zeros((self.query.numPts, 6))
     for nI, neuron in enumerate((target, self.query)):
       offset = 3*nI
