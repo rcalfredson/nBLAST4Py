@@ -28,10 +28,9 @@ def options():
     'decreases processing time if you have multiple query neurons, i.e., the ' +
     'duration of each individual search does not decrease)',
     type=int, default=1)
-  p.add_argument('--visualComp', type=bool, default=False, help='output ' +
-    'visual comparisons between the query neuron and the top 4 target neurons')
-  p.add_argument('--rescale', help='rescale coordinates of query neuron by ' +
-    'the given factor', type=float)
+  p.add_argument('--visualComp', action='store_true', default=False, help=
+    'output visual comparisons between the query neuron and the top 4 target' +
+    ' neurons')
   p.add_argument('--reflectX', help='flip sign of X coords of the query neuron ' +
     'by reflecting across the inputted X midpoint of the brain (e.g., 314 ' +
     ' microns for JRC2018F).', type=float)
@@ -48,15 +47,13 @@ def options():
 
 startT = timeit.default_timer()
 
-def runSingleThreadSearch(args):
+def runSingleThreadedSearch(args):
   queries, opts = args
   useParent = opts.dirVec=='parent'
   for query in queries:
     print('Running query for', query)
     query = SWCHelper(query, dirVectorFromParent=useParent,
       reflectX=opts.reflectX)
-    if opts.rescale:
-      query.rescale(opts.rescale)
     targets = globFiles(opts.tD, 'swc')
     random.shuffle(targets)
     nblast = NBLASTHelper(query, dirVectorFromParent=useParent,
@@ -79,7 +76,7 @@ def runSingleThreadSearch(args):
         encoding='utf-8') as f:
       json.dump(sortedScores, f, ensure_ascii=False, indent=4)
 
-def runSearch():
+def getThreadLists():
   opts = options()
   qIsFile, qIsDir = os.path.isfile(opts.query), os.path.isdir(opts.query)
   if not qIsDir and not qIsFile:
@@ -94,11 +91,15 @@ def runSearch():
       neurons = queryList.read().splitlines()
       queries = [os.path.join(opts.query, neuron) for neuron in neurons]
   nThreads = opts.nThreads
-  threadLists = [queries[i::nThreads] for i in range(nThreads)]
-  pool = ThreadPool(nThreads)
-  pool.map(runSingleThreadSearch, [[threadLists[i], opts] for i in \
-    range(nThreads)])
+  return [queries[i::nThreads] for i in range(nThreads)], opts
 
+def startThreadedSearch(threadLists, opts):
+  pool = ThreadPool(len(threadLists))
+  pool.map(runSingleThreadedSearch, [[threadLists[i], opts] for i in \
+    range(len(threadLists))])
+
+def runSearch():
+  startThreadedSearch(*getThreadLists())
   print('total compute time:', timeit.default_timer() - startT)
 
 if __name__ == "__main__":
