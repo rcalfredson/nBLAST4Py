@@ -3,7 +3,7 @@ import numpy as np
 from swcHelper import SWCHelper
 from unittest.mock import patch, mock_open
 
-with open('tests/data/target/5813061260Truncated.swc', 'r') as skelFile:
+with open('tests/data/5813061260Truncated.swc', 'r') as skelFile:
   skelData = skelFile.read()
 
 class TestSWCHelper:

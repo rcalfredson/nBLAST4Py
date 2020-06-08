@@ -62,12 +62,15 @@ def testCalculateDirectionVectorsFromParents():
   target = MockSkel(numPts=2)
   query.cleanUpParents()
   target.cleanUpParents()
-  query.x, query.y, query.z = np.array([1, 0]), np.array([0, 1]), np.array([1, 1])
-  target.x, target.y, target.z = np.array([0, 0]), np.array([0, 0.5]), np.array([0, 1])
+  query.x, query.y = np.array([1, 0]), np.array([0, 1])
+  query.z =  np.array([1, 1])
+  target.x, target.y = np.array([0, 0]), np.array([0, 0.5]),
+  target.z = np.array([0, 1])
   nbh = NBLASTHelper(query)
   # first row: from first point to second point
   # second row: from second point to first point
-  results = nbh.findDirectionVectorsFromParents(target, np.array([[1, 1], [0, 0]]))
+  results = nbh.findDirectionVectorsFromParents(target, query,
+    np.array([[1, 1], [0, 0]]))
   for i, vec in enumerate((target, query)):
     dirVec = [np.diff(getattr(vec, dim)) for dim in ('x', 'y', 'z')]
     dirVec = (dirVec / np.linalg.norm(dirVec)).T[0]

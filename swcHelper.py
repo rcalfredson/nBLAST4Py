@@ -15,9 +15,9 @@ class SWCHelper:
     self.path = path
     self.x, self.y, self.z, self.parents, self.ids = [], [], [], [], []
     pklPath = '%s.pickSkel'%path.split('.swc')[0]
-    hasPickle = os.path.exists(pklPath)
-    with open(pklPath if hasPickle else path, 'rb' if hasPickle else 'r') as f:
-      if hasPickle:
+    usePickle = os.path.exists(pklPath) and not dirVectorFromParent
+    with open(pklPath if usePickle else path, 'rb' if usePickle else 'r') as f:
+      if usePickle:
         tempData = pickle.load(f)
         self.__dict__.update(tempData)
       else:
@@ -36,7 +36,7 @@ class SWCHelper:
           self.resample(1)
           self.calcDirVectors()
         self.cleanUpParents()
-        if not hasPickle:
+        if not os.path.exists(pklPath) and not dirVectorFromParent:
           with open(pklPath, 'wb') as pickleFile:
             pickle.dump({dKey: self.__dict__[dKey] for dKey in self.__dict__ if\
               dKey is not 'tree'}, pickleFile, 2)

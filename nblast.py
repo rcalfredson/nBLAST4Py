@@ -35,7 +35,7 @@ class NBLASTHelper():
       .reshape(-1, 1)))
     dists = np.sqrt(np.squeeze(nns[1]))
     if self.dirVectorFromParent:
-      dirVectors = self.findDirectionVectorsFromParents(target, nnIdxs)
+      dirVectors = self.findDirectionVectorsFromParents(target, query, nnIdxs)
     else:
       dirVectors = np.hstack((target.dirVectors[nnIdxs[:, 0]],
         query.dirVectors[nnIdxs[:, 1]]))
@@ -54,7 +54,7 @@ class NBLASTHelper():
       identityScores = [self.runNBLASTForPair(self.query)]
     for i, target in enumerate(targets):
       start_time = timeit.default_timer()
-      target = SWCHelper(target)
+      target = SWCHelper(target, dirVectorFromParent=self.dirVectorFromParent)
       if self.fwdRevAvg:
         identityScores.append(self.runNBLASTForPair(target, query=target))
         scores.append(0.5*(self.runNBLASTForPair(target, reverse=True,
@@ -93,15 +93,15 @@ class NBLASTHelper():
       bins=np.array([distanceRanges, dotProdRanges]))[0]
     return np.sum(np.multiply(distBins, scoreTable))
 
-  def findDirectionVectorsFromParents(self, target, nnIdxs):
+  def findDirectionVectorsFromParents(self, target, query, nnIdxs):
     """Return an array of the component-wise distances between the parent point
     and the point of interest for both the query neuron and target neurons.
     """
     parentsIdxs = np.hstack((np.array(target.parents[nnIdxs[:, 0]]).reshape(
-      -1, 1), np.array(self.query.parents[nnIdxs[:, 1]]).reshape(-1, 1)))
+      -1, 1), np.array(query.parents[nnIdxs[:, 1]]).reshape(-1, 1)))
     parentsIdxs = np.subtract(parentsIdxs, 1, out=parentsIdxs, where=parentsIdxs>-1)
-    parentToPtDists = np.zeros((self.query.numPts, 6))
-    for nI, neuron in enumerate((target, self.query)):
+    parentToPtDists = np.zeros((query.numPts, 6))
+    for nI, neuron in enumerate((target, query)):
       offset = 3*nI
       preNorm = np.array([getattr(neuron, dim)[nnIdxs[:, nI]] - getattr(neuron,
         dim)[parentsIdxs[:, nI]] for dim in ('x', 'y', 'z')]).T
