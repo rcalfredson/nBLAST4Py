@@ -41,7 +41,7 @@ def testParentBasedTangentFwdRev():
         "${PATH_TO_TESTS}/data/query/skel0_mb399b_jrc.swc"))
       scores <- nblast_allbyall(c(queryNeuron, targetNeurons),
         normalisation="mean")
-      # final row of scores matrix contains relevant results
+      # final row of scores contains relevant results
     """
     results = result_filename%'_fwdRev'
     results_from_R = [0.18933926, 0.1336908, 0.02367754, -0.8361671]
@@ -51,4 +51,29 @@ def testParentBasedTangentFwdRev():
     with open(results, 'r') as f:
       scores = [el[1] for el in json.load(f)]
       assert np.all(np.isclose(results_from_R, scores, rtol=1e-3, atol=1e-3)) == True
+    os.remove(results)
+
+def testNeighborBasedTangentFwdRev():
+    """Ensure the results of NBLAST test match those from the existing
+    implementation in R. Conditions: nearest-neighbor-based vector calculations,
+    forward-reverse averaging.
+
+    How to replicate results in R using the nat.NBLAST library:
+      library(nat.nblast)
+      targetNeurons <- read.neurons("${PATH_TO_TESTS}/data/target",
+        pattern="(1324365879|5813061260|424789697|1036637638).swc")
+      queryNeuron <- neuronlist(read.neuron(
+        "${PATH_TO_TESTS}/data/query/skel0_mb399b_jrc.swc"))
+      scores <- nblast_allbyall(dotprops(c(targetNeurons, queryNeuron),
+        resample=1, k=5), normalisation="mean")
+      # final row of scores contains relevant results
+    """
+    results = result_filename%'_fwdRev'
+    results_from_R = [0.19463832, 0.1283570, 0.01524718, -0.8327490]
+    with patch.object(sys, 'argv', ['', 'tests/data/query/skel0_mb399b_jrc.swc',
+        '-tD', 'tests/data/target',  '--fwdRev']):
+      findNeuronMatches.runSearch()
+    with open(results, 'r') as f:
+      scores = [el[1] for el in json.load(f)]
+      assert np.all(np.isclose(results_from_R, scores, rtol=5e-2, atol=5e-2)) == True
     os.remove(results)
