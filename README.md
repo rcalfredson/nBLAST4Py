@@ -28,10 +28,12 @@ R is used for generating 3D images comparing the query neuron to its top 4 match
 
 After installation, add the R `bin` directory to your system path and confirm that the program `Rscript` works from a command line.
 
+Note that the R workspace loaded from the script contains anatomical landmarks transformed to the `JRC2018F` template (see step 1 of `Usage`); if you are using target skeletons registered to a different template, then it is necessary to override the lines where those structures (e.g., alpha and beta lobes, ellipsoid body) are plotted using `plot3d`.
+
 ## Usage
 1. Register your brain image stack to a template image, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/)
-    - Note: for Hemibrain, the [JRC 2018 central brain Female](https://www.janelia.org/open-science/jrc-2018-brain-templates) template is recommended because the target neurons in `hemibrainSkeletons.zip` have already been transformed to align with it.
-    - If you use a different template for your registration, then either your image or your annotated skeleton needs to be transformed to the above-mentioned template, using CMTK or the scripts in the repo [`saalfeldlab/template-building`](https://github.com/saalfeldlab/template-building).
+    - Note: for Hemibrain, the [JRC 2018 central brain Female](https://www.janelia.org/open-science/jrc-2018-brain-templates) (`JRC2018F`) template is recommended because the target neurons in `hemibrainSkeletons.zip` have already been transformed to align with it.
+    - If you are using your own target skeletons (not the default Hemibrain ones), then either your query image needs registered to the same template as the targets, or the annotated skeleton must be transformed using a [bridging registration](https://github.com/jefferislab/BridgingRegistrations)
 2. Annotate a neuron from your image.
     - [Simple Neurite Tracer](https://imagej.net/Simple_Neurite_Tracer) (plugin of [ImageJ](https://imagej.net/Welcome) or [Fiji](https://fiji.sc/)) is recommended, but any tool works as long as it outputs an SWC file.
 3. Run NBLAST search.
@@ -42,7 +44,7 @@ After installation, add the R `bin` directory to your system path and confirm th
 4. Inspect results.
     - The search script outputs a JSON file assigning a score to each target neuron in the target database, with a higher score implying a better match with the query neuron.
     - For Hemibrain search:
-      - Use the flag `--visualComp` to obtain 3D plots superimposing the query and target skeletons along with 3D anantomical landmarks. As noted above, using this feature requires an R installation.
+      - Use the flag `--visualComp` to obtain 3D plots superimposing the query and target skeletons along with 3D anantomical landmarks. As noted above, using this feature requires an R installation, and contains landmarks specific to the `JRC2018F` template.
       - Alternatively, visit Hemibrain's [neuPrintExplorer](https://neuprint.janelia.org/?dataset=hemibrain:v1.0.1&qt=findneurons).
         - Click the search icon (magnifying glass) in the left-hand sidebar, and copy and paste the numeric ID of a skeleton from the results file (e.g., 204962969); click on the result that appears under the header "Body IDs," of which there should be only one.
         - In the table of results, click the small eye icon beside the neuron ID and two visualizers will appear: Neuroglancer, which superimposes the skeleton and synapses of the neuron against the raw Hemibrain image data, and a simple skeleton viewer. The former is essential to determine whether the target neuron is located in the expected region of the brain.
