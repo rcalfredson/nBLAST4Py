@@ -33,7 +33,7 @@ Note that the R workspace loaded from the script contains anatomical landmarks t
 ## Usage
 1. Register your brain image stack to a template image, using a tool such as [CMTK](https://www.nitrc.org/projects/cmtk/)
     - Note: for Hemibrain, the [JRC 2018 central brain Female](https://www.janelia.org/open-science/jrc-2018-brain-templates) (`JRC2018F`) template is recommended because the target neurons in `hemibrainSkeletons.zip` have already been transformed to align with it.
-    - If you are using your own target skeletons (not the default Hemibrain ones), then either your query image needs registered to the same template as the targets, or the annotated skeleton must be transformed using a [bridging registration](https://github.com/jefferislab/BridgingRegistrations)
+    - If you are using your own target skeletons (not the default Hemibrain ones), then either your query image needs to be registered to the same template as the targets, or the annotated skeleton must be transformed using a [bridging registration](https://github.com/jefferislab/BridgingRegistrations).
 2. Annotate a neuron from your image.
     - [Simple Neurite Tracer](https://imagej.net/Simple_Neurite_Tracer) (plugin of [ImageJ](https://imagej.net/Welcome) or [Fiji](https://fiji.sc/)) is recommended, but any tool works as long as it outputs an SWC file.
 3. Run NBLAST search.
