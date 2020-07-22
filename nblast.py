@@ -90,7 +90,7 @@ class NBLASTHelper():
     dotProdRanges = np.array(dotProdRanges)
     dotProds = np.round(dotProds, decimals=5)
     distBins = np.histogram2d(dists, np.array(dotProds),
-      bins=np.array([distanceRanges, dotProdRanges]))[0]
+      bins=np.array([distanceRanges, dotProdRanges], dtype=object))[0]
     return np.sum(np.multiply(distBins, scoreTable))
 
   def findDirectionVectorsFromParents(self, target, query, nnIdxs):

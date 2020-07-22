@@ -65,8 +65,8 @@ def runSingleThreadedSearch(args):
       for ss in sortedScores[0:4]:
         my_env = os.environ.copy()
         my_env["PATH"] = my_env["PATH"]
-        subprocess.call(["Rscript", "--vanilla", "viewNeurons.r", ss[0],
-          query.path], shell=True, env=my_env)
+        subprocess.call(["Rscript", "--vanilla", "viewNeurons.r", '-q', '"' +\
+          query.path + '"', ss[0]], shell=True, env=my_env)
     for i, ss in enumerate(sortedScores):
       if os.path.basename(ss[0]) in largest_neurons:
         sortedScores[i] = ("%s (note: is among 100 largest Hemibrain neurons)"%(

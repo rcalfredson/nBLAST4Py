@@ -17,6 +17,11 @@ matplotlib = "*"
 pyinstaller = {file = "https://github.com/pyinstaller/pyinstaller/archive/develop.zip"}
 python-igraph = "*"
 trimesh = "*"
+neuprint-python = "*"
+tifffile = "*"
+requests = "*"
+jgo = "*"
+h5py = "*"
 
 [requires]
 python_version = "3.6"

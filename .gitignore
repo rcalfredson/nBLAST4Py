@@ -1,6 +1,7 @@
 .coverage*
 report.html
 assets/*
+data/fc_th/*
 htmlcov/*
 imgs/*
 skelDebug/*

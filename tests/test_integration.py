@@ -25,7 +25,7 @@ def testParentBasedTangent():
       findNeuronMatches.runSearch()
     with open(results, 'r') as f:
       scores = [el[1] for el in json.load(f)]
-      assert np.all(np.isclose(results_from_R, scores, rtol=1e-3, atol=1e-3)) == True
+      assert np.all(np.isclose(results_from_R, scores, rtol=1e-3)) == True
     os.remove(results)
 
 def testParentBasedTangentFwdRev():
@@ -50,7 +50,7 @@ def testParentBasedTangentFwdRev():
       findNeuronMatches.runSearch()
     with open(results, 'r') as f:
       scores = [el[1] for el in json.load(f)]
-      assert np.all(np.isclose(results_from_R, scores, rtol=1e-3, atol=1e-3)) == True
+      assert np.all(np.isclose(results_from_R, scores, rtol=1e-3)) == True
     os.remove(results)
 
 def testNeighborBasedTangent():
@@ -73,7 +73,7 @@ def testNeighborBasedTangent():
       findNeuronMatches.runSearch()
     with open(results, 'r') as f:
       scores = [el[1] for el in json.load(f)]
-      assert np.all(np.isclose(results_from_R, scores, rtol=1e-3, atol=1e-3)) == True
+      assert np.all(np.isclose(results_from_R, scores, rtol=1e-3)) == True
     os.remove(results)
 
 def testNeighborBasedTangentFwdRev():
@@ -98,5 +98,5 @@ def testNeighborBasedTangentFwdRev():
       findNeuronMatches.runSearch()
     with open(results, 'r') as f:
       scores = [el[1] for el in json.load(f)]
-      assert np.all(np.isclose(results_from_R, scores, rtol=5e-2, atol=5e-2)) == True
+      assert np.all(np.isclose(results_from_R, scores, rtol=1e-2)) == True
     os.remove(results)
